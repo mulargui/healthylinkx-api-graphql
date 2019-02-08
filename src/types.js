@@ -3,21 +3,15 @@ const { gql } = require('apollo-server');
 
 // Type definitions define the "shape" of your data 
 const typeDefs = gql`
-	# Comments in GraphQL are defined with the hash (#) symbol.
 
-	# This "Book" type can be used in other type declarations.
-	type Book {
-		title: String
-		author: String
-	}
-  
 	type Speciality {
-		name: String
+		Classification: String
 	}
 
 	type Provider {
 		npi: String 
 		lastName: String
+		# this needs to be converted to Speciality
 		classification: String
 		postalCode: String
 		gender: String
@@ -39,8 +33,9 @@ const typeDefs = gql`
 
 	# The "Query" type is the root of all GraphQL queries.
 	type Query {
-		providers: [Provider]
+		taxonomy: [Speciality]
 		specialities: [Speciality]
+		providers: [Provider]
 		transactions: [Transaction]
 	}
 
