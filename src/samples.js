@@ -89,6 +89,6 @@ const transactions = [
 	},
 ];
 
-exports.specialities=specialities;
-exports.providers=providers;
+//exports.specialities=specialities;
+//exports.providers=providers;
 exports.transactions=transactions;
