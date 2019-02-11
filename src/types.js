@@ -11,14 +11,13 @@ const typeDefs = gql`
 	type Provider {
 		npi: String! 
 		lastName: String!
-		# this needs to be converted to Speciality
 		classification: String
 		postalCode: String
 		gender: String
 		fullName: String
 		fullStreet: String
 		fullCity: String
-		businessPracticeLocationAddressTelephoneNumber: String
+		telephone: String
 	}
 	
 	type Transaction {
@@ -26,6 +25,7 @@ const typeDefs = gql`
 		id: String!
 		# this needs to be converted to a MySQL timestamp
 		ts: String!
+		# this needs to be converted to array of Provider
 		npi1: String!
 		npi2: String
 		npi3: String
@@ -42,23 +42,20 @@ const typeDefs = gql`
 			postalCode: String
 			distance: Int
 		): [Provider]
-		#it should return one not an array
 		SearchProvider(
 			npi: String!
-		): [Provider]
-		#it should return one not an array
+		): Provider
 		SearchBooking(
 			id: String!
-		): [Transaction]
+		): Transaction
 	}
 	
 	type Mutation {
-		#it should return one not an array
 		BookProviders(
 			npi1: String!
 			npi2: String
 			npi3: String
-		): [Transaction]
+		): Transaction
 	}
 `;
 

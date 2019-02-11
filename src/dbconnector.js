@@ -49,7 +49,7 @@ function SearchProviders(args){
 		"Provider_Full_Name as fullName, " +
 		"Provider_Full_Street as fullStreet, " +
 		"Provider_Full_City as fullCity, " +
-		"Provider_Business_Practice_Location_Address_Telephone_Number as businessPracticeLocationAddressTelephoneNumber " +
+		"Provider_Business_Practice_Location_Address_Telephone_Number as telephone " +
 		"FROM npidata2 WHERE (";
  	if(lastName1)
  		query += "((Provider_Last_Name_Legal_Name = '" + lastName1 + "')";
@@ -111,7 +111,7 @@ function SearchProvider(args){
 		"Provider_Full_Name as fullName, " +
 		"Provider_Full_Street as fullStreet, " +
 		"Provider_Full_City as fullCity, " +
-		"Provider_Business_Practice_Location_Address_Telephone_Number as businessPracticeLocationAddressTelephoneNumber " +
+		"Provider_Business_Practice_Location_Address_Telephone_Number as telephone " +
 		"FROM npidata2 " +
 		"WHERE NPI = "+npi;
 
@@ -126,7 +126,7 @@ function SearchProvider(args){
 	}).then(function(results){
 		connection.end();
 		console.log(JSON.stringify(results));
-		return results;
+		return results[0];
 	});
 }
 
@@ -157,7 +157,7 @@ function SearchBooking(args){
 	}).then(function(results){
 		connection.end();
 		console.log(JSON.stringify(results));
-		return results;
+		return results[0];
 	});
 }
 
