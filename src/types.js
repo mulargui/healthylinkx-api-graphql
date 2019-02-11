@@ -32,17 +32,33 @@ const typeDefs = gql`
 	}
 
 	type Query {
-		taxonomy: [Speciality]
-		providers(
-			lastName1: String!
+		SpecialityList: [Speciality]
+		SearchProviders(
+			lastName1: String
 			lastName2: String
 			lastName3: String
 			classification: String
 			gender: String
-			postalCode: String!
+			postalCode: String
 			distance: Int
 		): [Provider]
-		transactions: [Transaction]
+		#it should return one not an array
+		SearchProvider(
+			npi: String!
+		): [Provider]
+		#it should return one not an array
+		SearchBooking(
+			id: String!
+		): [Transaction]
+	}
+	
+	type Mutation {
+		#it should return one not an array
+		BookProviders(
+			npi1: String!
+			npi2: String
+			npi3: String
+		): [Transaction]
 	}
 `;
 
