@@ -3,7 +3,8 @@ var mysql=require("promise-mysql");
 var constants = require("./constants.js");
 var restapi = require('request-promise-native');
 
-function SpecialityList() {
+//helper function to access to MySQL
+function GetDBData(query) {
 	return mysql.createConnection({
 		host:constants.host,
 		user:constants.user,
@@ -11,11 +12,17 @@ function SpecialityList() {
 		database:constants.database
 	}).then(function(conn){
 		connection = conn;
-		return connection.query("SELECT Classification as name FROM taxonomy");
+		return connection.query(query);
 	}).then(function(results){
 		connection.end();
+		//console.log(JSON.stringify(results));
+		//console.log(results);
 		return results;
 	});
+}
+
+function SpecialityList() {
+	return GetDBData("SELECT Classification as name FROM taxonomy");
 }
 
 function SearchProviders(args){ 
@@ -80,23 +87,12 @@ function SearchProviders(args){
 				query += "(Provider_Short_Postal_Code = '" + postalCode + "')";
 		query += ") limit 50";
  		
-		return mysql.createConnection({
-			host:constants.host,
-			user:constants.user,
-			password:constants.password,
-			database:constants.database
-		}).then(function(conn){
-			connection = conn;
-			return connection.query(query);
-		}).then(function(results){
-			connection.end();
-			return results;
-		});
+		return GetDBData(query);
 	}
 	
 	//case 2:we need to find zipcodes at a distance
 
- 	//lets get a few zipcodes
+ 	//rest api to get postal codes at a distance
  	var queryapi = "/rest/GFfN8AXLrdjnQN08Q073p9RK9BSBGcmnRBaZb8KCl40cR1kI1rMrBEbKg4mWgJk7/radius.json/" + postalCode + "/" + distance + "/mile";
 	var responsestring="";
 
@@ -106,6 +102,7 @@ function SearchProviders(args){
 		json: true // Automatically parses the JSON string in the response
  	};
 
+	//first we get the list of postal codes at that distance
 	return restapi(options)
     .catch(function (err) {
 		throw err;
@@ -118,7 +115,7 @@ function SearchProviders(args){
 
 		var length=response.zip_codes.length;
 
-		//complete the query
+		//complete the query with all postal codes
  		if(lastName1 || gender || classification)
  			query += " AND ((Provider_Short_Postal_Code = '"+response.zip_codes[0].zip_code+"')";
  		else
@@ -128,20 +125,7 @@ function SearchProviders(args){
 		}
   		query += ")) limit 50";
 
-		return mysql.createConnection({
-			host:constants.host,
-			user:constants.user,
-			password:constants.password,
-			database:constants.database
-		}).then(function(conn){
-			connection = conn;
-			return connection.query(query);
-		}).then(function(results){
-			connection.end();
-			console.log(JSON.stringify(results));
-			console.log(results);
-			return results;
-		});
+		return GetDBData(query);
 	});		
 }
 
@@ -166,16 +150,8 @@ function SearchProvider(args){
 		"FROM npidata2 " +
 		"WHERE NPI = "+npi;
 
-	return mysql.createConnection({
-		host:constants.host,
-		user:constants.user,
-		password:constants.password,
-		database:constants.database
-	}).then(function(conn){
-		connection = conn;
-		return connection.query(query);
-	}).then(function(results){
-		connection.end();
+	return GetDBData(query)
+	.then(function(results){
 		return results[0];
 	});
 }
@@ -198,16 +174,8 @@ function SearchBooking(args){
 		"FROM transactions " +
 		"WHERE id = "+id;
 
-	return mysql.createConnection({
-		host:constants.host,
-		user:constants.user,
-		password:constants.password,
-		database:constants.database
-	}).then(function(conn){
-		connection = conn;
-		return connection.query(query);
-	}).then(function(results){
-		connection.end();
+	return GetDBData(query)
+	.then(function(results){
 		return results[0];
 	});
 }
@@ -225,16 +193,8 @@ function BookProviders(args){
 	//building the query
 	var query = "INSERT INTO transactions VALUES (DEFAULT,DEFAULT,'"+ npi1 +"','"+ npi2 +"','"+npi3 +"')";
 	
-	return mysql.createConnection({
-		host:constants.host,
-		user:constants.user,
-		password:constants.password,
-		database:constants.database
-	}).then(function(conn){
-		connection = conn;
-		return connection.query(query);
-	}).then(function(results){
-		connection.end();
+	return GetDBData(query)
+	.then(function(results){
 		return SearchBooking({id: results.insertId});
 	});
 }
