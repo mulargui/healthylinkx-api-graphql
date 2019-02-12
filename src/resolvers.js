@@ -1,9 +1,11 @@
 
 //const samples = require("./samples.js");
 const dbconnector = require("./dbconnector.js");
+const { GraphQLDateTime } = require('graphql-iso-date');
 
 // Resolvers define the technique for fetching the types in the schema.
 const resolvers = {
+	DateTime: GraphQLDateTime,
 	Query: {
 		SpecialityList: () => { return dbconnector.SpecialityList();},
 		SearchProviders(parent, args){ 

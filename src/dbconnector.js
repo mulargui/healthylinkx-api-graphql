@@ -1,6 +1,7 @@
 
 var mysql=require("promise-mysql");
 var constants = require("./constants.js");
+var restapi = require('request-promise-native');
 
 function SpecialityList() {
 	return mysql.createConnection({
@@ -71,7 +72,7 @@ function SearchProviders(args){
  			query += "(Classification = '" + classification + "')";
 	
  	//case 1: no need to calculate zip codes at a distance
- 	//if (!distance || !postalCode){
+ 	if (!distance || !postalCode){
  		if(postalCode)
 			if(lastName1 || gender || classification)
 				query += " AND (Provider_Short_Postal_Code = '"+ postalCode + "')";
@@ -91,7 +92,57 @@ function SearchProviders(args){
 			connection.end();
 			return results;
 		});
-	//}
+	}
+	
+	//case 2:we need to find zipcodes at a distance
+
+ 	//lets get a few zipcodes
+ 	var queryapi = "/rest/GFfN8AXLrdjnQN08Q073p9RK9BSBGcmnRBaZb8KCl40cR1kI1rMrBEbKg4mWgJk7/radius.json/" + postalCode + "/" + distance + "/mile";
+	var responsestring="";
+
+	var options = {
+  		uri: "http://zipcodedistanceapi.redline13.com" + queryapi,
+		headers: {'User-Agent': 'Request-Promise'},
+		json: true // Automatically parses the JSON string in the response
+ 	};
+
+	return restapi(options)
+    .catch(function (err) {
+		throw err;
+    })
+    .then(function (response) {
+ 		//no data
+ 		if (!response) {	
+			throw new Error('postal codes search not working');
+		}
+
+		var length=response.zip_codes.length;
+
+		//complete the query
+ 		if(lastName1 || gender || classification)
+ 			query += " AND ((Provider_Short_Postal_Code = '"+response.zip_codes[0].zip_code+"')";
+ 		else
+ 			query += "((Provider_Short_Postal_Code = '"+response.zip_codes[0].zip_code+"')";
+		for (var i=1; i<length;i++){
+ 			query += " OR (Provider_Short_Postal_Code = '"+ response.zip_codes[i].zip_code +"')";
+		}
+  		query += ")) limit 50";
+
+		return mysql.createConnection({
+			host:constants.host,
+			user:constants.user,
+			password:constants.password,
+			database:constants.database
+		}).then(function(conn){
+			connection = conn;
+			return connection.query(query);
+		}).then(function(results){
+			connection.end();
+			console.log(JSON.stringify(results));
+			console.log(results);
+			return results;
+		});
+	});		
 }
 
 function SearchProvider(args){ 
@@ -125,17 +176,18 @@ function SearchProvider(args){
 		return connection.query(query);
 	}).then(function(results){
 		connection.end();
-		console.log(JSON.stringify(results));
 		return results[0];
 	});
 }
 
 function SearchBooking(args){ 
 	var id = args.id;
+	
  	//check params
  	if(!id){
 		throw new Error('Too little parameters');
  	}
+	
 	//building the query
  	var query = "SELECT " +
 		"id as id, " +
@@ -156,7 +208,6 @@ function SearchBooking(args){
 		return connection.query(query);
 	}).then(function(results){
 		connection.end();
-		console.log(JSON.stringify(results));
 		return results[0];
 	});
 }
@@ -184,7 +235,6 @@ function BookProviders(args){
 		return connection.query(query);
 	}).then(function(results){
 		connection.end();
-		console.log(JSON.stringify(results));
 		return SearchBooking({id: results.insertId});
 	});
 }

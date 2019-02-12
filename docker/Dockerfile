@@ -4,7 +4,7 @@ RUN DEBIAN_FRONTEND=noninteractive
 
 # Install node.js, and supplementary programs
 RUN apt-get -q update && apt-get -y -q install nodejs npm 
-RUN npm install -g promise-mysql apollo-server graphql nodemon
+RUN npm install -g promise-mysql apollo-server graphql nodemon graphql-iso-date request request-promise-native
 
 ENV NODE_PATH /usr/local/lib/node_modules
  

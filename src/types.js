@@ -1,9 +1,12 @@
 
 const { gql } = require('apollo-server');
+const { GraphQLDateTime } = require('graphql-iso-date');
 
 // Type definitions define the "shape" of your data 
 const typeDefs = gql`
 
+	scalar DateTime
+	
 	type Speciality {
 		name: String!
 	}
@@ -21,11 +24,10 @@ const typeDefs = gql`
 	}
 	
 	type Transaction {
-		# this needs to be converted to ID
 		id: String!
-		# this needs to be converted to a MySQL timestamp
-		ts: String!
+		ts: DateTime!
 		# this needs to be converted to array of Provider
+		#providers: [Provider!]!
 		npi1: String!
 		npi2: String
 		npi3: String
