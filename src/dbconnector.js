@@ -29,25 +29,25 @@ function SpecialityList() {
 }
 
 function SearchProviders(args){ 
-	var lastName1 = args.lastName1;
-	var lastName2 = args.lastName2;
-	var lastName3 = args.lastName3;
 	var classification = args.classification;
 	var gender = args.gender;
 	var postalCode = args.postalCode;
 	var distance = args.distance;
+	var lastName = args.lastName;
+	var lastNameCount = 0;
+	if (lastName) lastNameCount = lastName.length;
 
  	//check params
- 	if(!postalCode && !lastName1 && !classification){
+ 	if(!postalCode && !lastNameCount && !classification){
 		throw new Error('Too little parameters');
  	}
- 	if(lastName1 && !postalCode && !classification){
+ 	if(lastNameCount && !postalCode && !classification){
 		throw new Error('Too little parameters');
  	}
- 	if(postalCode && !lastName1 && !classification){
+ 	if(postalCode && !lastNameCount && !classification){
 		throw new Error('Too little parameters');
  	}
- 	if(classification && !postalCode && !lastName1){
+ 	if(classification && !postalCode && !lastNameCount){
 		throw new Error('Too little parameters');
  	}
 
@@ -62,21 +62,20 @@ function SearchProviders(args){
 		"Provider_Full_City as fullCity, " +
 		"Provider_Business_Practice_Location_Address_Telephone_Number as telephone " +
 		"FROM npidata2 WHERE (";
- 	if(lastName1)
- 		query += "((Provider_Last_Name_Legal_Name = '" + lastName1 + "')";
- 	if(lastName2)
- 		query += " OR (Provider_Last_Name_Legal_Name = '" + lastName2 + "')";
- 	if(lastName3)
- 		query += " OR (Provider_Last_Name_Legal_Name = '" + lastName3 + "')";
- 	if(lastName1)
+ 	if(lastNameCount)
+ 		query += "((Provider_Last_Name_Legal_Name = '" + lastName[0] + "')";
+	for (var i=1; i<lastNameCount;i++){
+ 		query += " OR (Provider_Last_Name_Legal_Name = '" + lastName[i] + "')";
+	}
+ 	if(lastNameCount)
  		query += ")";
  	if(gender)
- 		if(lastName1)
+ 		if(lastNameCount)
  			query += " AND (Provider_Gender_Code = '" + gender + "')";
  		else
  			query += "(Provider_Gender_Code = '" + gender + "')";
  	if(classification)
- 		if(lastName1 || gender)
+ 		if(lastNameCount || gender)
  			query += " AND (Classification = '" + classification + "')";
  		else
  			query += "(Classification = '" + classification + "')";
@@ -84,7 +83,7 @@ function SearchProviders(args){
  	//case 1: no need to calculate zip codes at a distance
  	if (!distance || !postalCode){
  		if(postalCode)
-			if(lastName1 || gender || classification)
+			if(lastNameCount || gender || classification)
 				query += " AND (Provider_Short_Postal_Code = '"+ postalCode + "')";
 			else
 				query += "(Provider_Short_Postal_Code = '" + postalCode + "')";
@@ -120,7 +119,7 @@ function SearchProviders(args){
 		var length=response.zip_codes.length;
 
 		//complete the query with all postal codes
- 		if(lastName1 || gender || classification)
+ 		if(lastNameCount || gender || classification)
  			query += " AND ((Provider_Short_Postal_Code = '"+response.zip_codes[0].zip_code+"')";
  		else
  			query += "((Provider_Short_Postal_Code = '"+response.zip_codes[0].zip_code+"')";

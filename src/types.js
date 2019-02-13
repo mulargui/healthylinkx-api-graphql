@@ -36,9 +36,7 @@ const typeDefs = gql`
 	type Query {
 		SpecialityList: [Speciality]
 		SearchProviders(
-			lastName1: String
-			lastName2: String
-			lastName3: String
+			lastName: [String]
 			classification: String
 			gender: String
 			postalCode: String
