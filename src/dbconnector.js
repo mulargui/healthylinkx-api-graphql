@@ -21,7 +21,10 @@ function GetDBData(query) {
 	});
 }
 
+//bellow all the graphql queries and mutations
+
 function SpecialityList() {
+	//return the results
 	return GetDBData("SELECT Classification as name FROM taxonomy");
 }
 
@@ -87,6 +90,7 @@ function SearchProviders(args){
 				query += "(Provider_Short_Postal_Code = '" + postalCode + "')";
 		query += ") limit 50";
  		
+		//return the results
 		return GetDBData(query);
 	}
 	
@@ -94,8 +98,6 @@ function SearchProviders(args){
 
  	//rest api to get postal codes at a distance
  	var queryapi = "/rest/GFfN8AXLrdjnQN08Q073p9RK9BSBGcmnRBaZb8KCl40cR1kI1rMrBEbKg4mWgJk7/radius.json/" + postalCode + "/" + distance + "/mile";
-	var responsestring="";
-
 	var options = {
   		uri: "http://zipcodedistanceapi.redline13.com" + queryapi,
 		headers: {'User-Agent': 'Request-Promise'},
@@ -107,12 +109,14 @@ function SearchProviders(args){
     .catch(function (err) {
 		throw err;
     })
+	//then we add the postal codes to the query
     .then(function (response) {
  		//no data
  		if (!response) {	
 			throw new Error('postal codes search not working');
 		}
 
+		//how many postal codes
 		var length=response.zip_codes.length;
 
 		//complete the query with all postal codes
@@ -125,6 +129,7 @@ function SearchProviders(args){
 		}
   		query += ")) limit 50";
 
+		//return the results
 		return GetDBData(query);
 	});		
 }
@@ -150,6 +155,7 @@ function SearchProvider(args){
 		"FROM npidata2 " +
 		"WHERE NPI = "+npi;
 
+	//return the results
 	return GetDBData(query)
 	.then(function(results){
 		return results[0];
@@ -174,6 +180,7 @@ function SearchBooking(args){
 		"FROM transactions " +
 		"WHERE id = "+id;
 
+	//return the results
 	return GetDBData(query)
 	.then(function(results){
 		return results[0];
@@ -193,6 +200,7 @@ function BookProviders(args){
 	//building the query
 	var query = "INSERT INTO transactions VALUES (DEFAULT,DEFAULT,'"+ npi1 +"','"+ npi2 +"','"+npi3 +"')";
 	
+	//return the results
 	return GetDBData(query)
 	.then(function(results){
 		return SearchBooking({id: results.insertId});

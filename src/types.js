@@ -26,11 +26,11 @@ const typeDefs = gql`
 	type Transaction {
 		id: String!
 		ts: DateTime!
-		# this needs to be converted to array of Provider
+		# better converted to an array of Providers
 		#providers: [Provider!]!
-		npi1: String!
-		npi2: String
-		npi3: String
+		npi1: Provider!
+		npi2: Provider
+		npi3: Provider
 	}
 
 	type Query {

@@ -1,7 +1,10 @@
 
-rem this can be optimized, in the meantime we cleanup everything and set it up again
-call %~dp0.\cleanup.bat
-call %~dp0.\setup.bat
+kubectl scale deployment healthylinkx-api-deployment --replicas 0
+
+rem wait till everything is down
+timeout 45
+
+kubectl scale deployment healthylinkx-api-deployment --replicas 1
 
 exit /B 0
 
