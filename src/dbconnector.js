@@ -177,7 +177,7 @@ function SearchBooking(args){
 		"NPI2 as npi2, " +
 		"NPI3 as npi3 " +
 		"FROM transactions " +
-		"WHERE id = "+id;
+		"WHERE id = " + id;
 
 	//return the results
 	return GetDBData(query)
@@ -187,17 +187,23 @@ function SearchBooking(args){
 }
 
 function BookProviders(args){ 
-	var npi1 = args.npi1;
-	var npi2 = args.npi2;
-	var npi3 = args.npi3;
+	var npi = args.npi;
+	var npiCount = 0;
+	if (npi) npiCount = npi.length;
 
  	//check params
- 	if(!npi1){
+ 	if(!npiCount){
 		throw new Error('Too little parameters');
  	}
 
 	//building the query
-	var query = "INSERT INTO transactions VALUES (DEFAULT,DEFAULT,'"+ npi1 +"','"+ npi2 +"','"+npi3 +"')";
+	//due to limitations in the data model we book max of 3
+	var query = "INSERT INTO transactions VALUES (DEFAULT,DEFAULT,'" + npi[0] + "'";
+	if (npiCount > 1) query += ",'" + npi[1] + "'";
+	else query += ", null";
+	if (npiCount > 2) query += ",'" + npi[2] + "'";
+	else query += ", null";
+	query += ")";
 	
 	//return the results
 	return GetDBData(query)

@@ -26,11 +26,7 @@ const typeDefs = gql`
 	type Transaction {
 		id: String!
 		ts: DateTime!
-		# better converted to an array of Providers
-		#providers: [Provider!]!
-		npi1: Provider!
-		npi2: Provider
-		npi3: Provider
+		providers: [Provider!]!
 	}
 
 	type Query {
@@ -52,9 +48,7 @@ const typeDefs = gql`
 	
 	type Mutation {
 		BookProviders(
-			npi1: String!
-			npi2: String
-			npi3: String
+			npi: [String!]!
 		): Transaction
 	}
 `;

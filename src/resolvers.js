@@ -7,18 +7,23 @@ const { GraphQLDateTime } = require('graphql-iso-date');
 const resolvers = {
 	DateTime: GraphQLDateTime,
 	Transaction: { 
-		npi1: (parent) => {
-			if (parent.npi1 == 'undefined') return undefined;
-			return dbconnector.SearchProvider({npi:parent.npi1});
-		},
-		npi2: (parent) => { 
-			if (parent.npi2 == 'undefined') return undefined;
-			return dbconnector.SearchProvider({npi:parent.npi2});
-		},
-		npi3: (parent) => {
-			if (parent.npi3 == 'undefined') return undefined;
-			return dbconnector.SearchProvider({npi:parent.npi3});
-		},
+		providers: (parent) => {
+			var arr = []; 
+			return dbconnector.SearchProvider({npi:parent.npi1})
+			.then(function(result){
+				if (result == undefined) return arr;
+				if(result !== arr) arr.push(Object.assign({}, result));
+				return dbconnector.SearchProvider({npi:parent.npi2});
+			}).then(function(result){
+				if (result == undefined) return arr;
+				if(result !== arr) arr.push(Object.assign({}, result));
+				return dbconnector.SearchProvider({npi:parent.npi3});
+			}).then(function(result){
+				if (result == undefined) return arr;
+				if(result !== arr) arr.push(Object.assign({}, result));
+				return arr;
+			});
+		}, 
 	},
 	Query: {
 		SpecialityList: () => { return dbconnector.SpecialityList();},
