@@ -135,13 +135,13 @@ function SearchProviders(args){
 
 function SearchProvider(args){ 
 	var npi = args.npi;
-
+	
  	//check params
  	if(!npi){
 		throw new Error('Too little parameters');
  	}
 			
-	//building the query
+	//build the query
  	var query = "SELECT NPI as npi, " +
 		"Provider_Last_Name_Legal_Name as lastName, " +
 		"Classification as classification, " +
@@ -169,7 +169,7 @@ function SearchBooking(args){
 		throw new Error('Too little parameters');
  	}
 	
-	//building the query
+	//build the query
  	var query = "SELECT " +
 		"id as id, " +
 		"ts as ts, " +
@@ -196,13 +196,13 @@ function BookProviders(args){
 		throw new Error('Too little parameters');
  	}
 
-	//building the query
+	//build the query
 	//due to limitations in the data model we book max of 3
-	var query = "INSERT INTO transactions VALUES (DEFAULT,DEFAULT,'" + npi[0] + "'";
+	var query = "INSERT INTO transactions (id, ts, NPI1, NPI2, NPI3) VALUES (DEFAULT,DEFAULT,'" + npi[0] + "'";
 	if (npiCount > 1) query += ",'" + npi[1] + "'";
-	else query += ", null";
+	else query += ", DEFAULT";
 	if (npiCount > 2) query += ",'" + npi[2] + "'";
-	else query += ", null";
+	else query += ", DEFAULT";
 	query += ")";
 	
 	//return the results
